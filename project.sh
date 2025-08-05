@@ -567,7 +567,7 @@ Deadlock Avoidance: If granting a request would lead to an unsafe state, the req
 
         declare -a options_a=(
             "Syntax errors"
-            "Preemption"
+            "Starvation"
             "Mutual exclusion"
             "To maximize resource use"
             "Need = Allocation - Max"
@@ -631,49 +631,72 @@ Deadlock Avoidance: If granting a request would lead to an unsafe state, the req
 
         echo "<div id='final-result' class='result' style='font-size:1.3em; margin-top: 40px;'></div>"
 
-        echo "<script>
-        let scores = [0, 0, 0, 0];
-        const correct = {
-            q1: 'b', q2: 'a', q3: 'c',
-            q4: 'b', q5: 'b', q6: 'b',
-            q7: 'c', q8: 'a', q9: 'c',
-            q10: 't', q11: 'f', q12: 'f'
-        };
-        function submitLevel(level) {
-            let start = (level - 1) * 3 + 1;
-            let score = 0;
-            let feedback = '';
-            for (let i = start; i < start + 3; i++) {
-                let selected = document.querySelector('input[name=q' + i + ']:checked');
-                if (!selected) {
-                    alert('Please answer question Q' + i);
-                    return;
-                }
-                if (selected.value === correct['q' + i]) {
-                    score++;
-                    feedback += '✔ Q' + i + ': Correct<br>';
-                } else {
-                    feedback += '❌ Q' + i + ': Incorrect (Correct: ' + correct['q' + i].toUpperCase() + ')<br>';
-                }
-            }
-            scores[level - 1] = score;
-            document.getElementById('result' + level).innerHTML = 'Score: ' + score + ' / 3<br>' + feedback;
-
-            document.getElementById('level' + level).classList.add('hidden');
-            if (level < 4) {
-                document.getElementById('level' + (level + 1)).classList.remove('hidden');
-            } else {
-                let total = scores.reduce((a, b) => a + b, 0);
-                document.getElementById('final-result').innerHTML = '🏁 Total Score: ' + total + ' / 12';
-            }
+echo "<script>
+let scores = [0, 0, 0, 0];
+const correct = {
+    q1: 'b', q2: 'a', q3: 'c',
+    q4: 'b', q5: 'b', q6: 'b',
+    q7: 'c', q8: 'a', q9: 'c',
+    q10: 't', q11: 'f', q12: 'f'
+};
+function submitLevel(level) {
+    let start = (level - 1) * 3 + 1;
+    let score = 0;
+    let feedback = '';
+    for (let i = start; i < start + 3; i++) {
+        let selected = document.querySelector('input[name=q' + i + ']:checked');
+        if (!selected) {
+            alert('Please answer question Q' + i);
+            return;
         }
+        if (selected.value === correct['q' + i]) {
+            score++;
+            feedback += '✔ Q' + i + ': Correct<br>';
+        } else {
+            feedback += '❌ Q' + i + ': Incorrect (Correct: ' + correct['q' + i].toUpperCase() + ')<br>';
+        }
+    }
+    scores[level - 1] = score;
+    document.getElementById('result' + level).innerHTML = 'Score: ' + score + ' / 3<br>' + feedback;
 
-        window.onload = () => {
-            document.getElementById('level1').classList.remove('hidden');
-        };
-        </script>"
+    document.getElementById('level' + level).classList.add('hidden');
+    if (level < 4) {
+        document.getElementById('level' + (level + 1)).classList.remove('hidden');
+    } else {
+        let total = scores.reduce((a, b) => a + b, 0);
+        document.getElementById('final-result').innerHTML = '🏁 Total Score: ' + total + ' / 12';
+    }
+}
 
-        echo "</body></html>"
+window.onload = () => {
+    document.getElementById('level1').classList.remove('hidden');
+};
+</script>"
+
+# New button and answer section
+echo "<button onclick=\"document.getElementById('correct-answers').classList.toggle('hidden')\">Show Correct Answers</button>"
+
+echo "<div id='correct-answers' class='hidden' style='margin-top: 30px;'>
+<h3>✅ Correct Answers</h3>
+<ol>
+    <li>Q1: Resource waiting cycle (b)</li>
+    <li>Q2: Starvation (a)</li>
+    <li>Q3: Priority scheduling (c)</li>
+    <li>Q4: To avoid deadlock (b)</li>
+    <li>Q5: Need = Max - Allocation (b)</li>
+    <li>Q6: Deadlock is impossible (b)</li>
+    <li>Q7: Preemption with rollback (c)</li>
+    <li>Q8: Increased CPU usage (a)</li>
+    <li>Q9: Need matrix (c)</li>
+    <li>Q10: True (t)</li>
+    <li>Q11: False (f)</li>
+    <li>Q12: False (f)</li>
+</ol>
+</div>"
+
+echo "</body></html>"
+
+        
     } > "$html_file"
 
     echo -e "\e[32m✔ Exported to $html_file\e[0m"
@@ -709,8 +732,17 @@ menu() {
             6) show_stats ;;
             7) export_html_report ;;
             8) read_input ;;
+
 9) generate_random_input; display_state ;;
             10)generate_lessons_and_quiz_html ;;
+
+
+
+
+
+
+
+
             11) echo -e "${YELLOW}👋 Exiting Simulation. Goodbye!${NC}"; exit 0 ;;
             *) echo -e "${RED}❌ Invalid option. Please try again.${NC}" ;;
         esac
